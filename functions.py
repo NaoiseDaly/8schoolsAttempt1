@@ -4,7 +4,9 @@ import logging
 logger = logging.getLogger(__name__)
 from time import perf_counter
 from scipy.stats import norm, uniform
+import pandas as pd
 
+DATA = pd.read_csv("data.txt").rename(index = dict( (i, letter) for i, letter in enumerate("ABCDEFGH") ) )
 
 def tau_MCMC(X0, max_t_iterations=10**3):
     """very simple version for this example 
@@ -15,7 +17,12 @@ def tau_MCMC(X0, max_t_iterations=10**3):
     start_time = perf_counter()
 
     def log_unnormalised_target_pdf(x):
-        pass
+        """ log of tau's unnormalised pdf
+         tau > 0 """
+        if x <= 0:
+            return -np.inf #log of zero
+        
+        
     
     def log_proposal_pdf(x, conditional):
         pass
