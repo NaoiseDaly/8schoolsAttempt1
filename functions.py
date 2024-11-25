@@ -8,10 +8,19 @@ import pandas as pd
 
 DATA = pd.read_csv("data.txt").rename(index = dict( (i, letter) for i, letter in enumerate("ABCDEFGH") ) )
 
+def get_total_precision_and_precision_weighted_average(tau):
+
+    total_var = np.sum( 1/(  tau**2 +DATA["sigma.j"]**2)   )
+
+    total_precision = total_var**-1
+
+    average = np.sum(DATA["yBar.j"]/(tau**2 +DATA["sigma.j"]**2 ) )
+    precision_weighted_average = average/total_precision
+
+    return total_precision, precision_weighted_average
+
 def tau_MCMC(X0, max_t_iterations=10**3):
-    """very simple version for this example 
-    
-    assumes 1 dimension in X"""
+    """simulate tau, the population sd hyperparameter"""
 
     #start timing here
     start_time = perf_counter()
@@ -60,6 +69,13 @@ def tau_MCMC(X0, max_t_iterations=10**3):
     )
 
     return chain
+
+def mu_given_tau(tau):
+
+    total_precision, mean = get_total_precision_and_precision_weighted_average(tau)
+    sd = np.sqrt(total_precision)
+
+    return norm.rvs( loc = mean, scale = sd )
 
 def simply_plot_the_chain(chain, with_burn_in = None, fmt_plt = "-"):
     """plot the chain over time
