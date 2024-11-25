@@ -10,9 +10,7 @@ DATA = pd.read_csv("data.txt").rename(index = dict( (i, letter) for i, letter in
 
 def get_total_precision_and_precision_weighted_average(tau:float):
 
-    total_var = np.sum( 1/(  tau**2 +DATA["sigma.j"]**2)   )
-
-    total_precision = total_var**-1
+    total_precision = np.sum( 1/(  tau**2 +DATA["sigma.j"]**2)  )
 
     average = np.sum(DATA["yBar.j"]/(tau**2 +DATA["sigma.j"]**2 ) )
     precision_weighted_average = average/total_precision
@@ -78,34 +76,36 @@ def tau_MCMC(X0, max_t_iterations=10**3):
 
     return chain
 
-def theta_given_hyperparams(mu, tau, sample_mean ,sample_var):
+def theta_given_hyperparams(mu, tau, sample_mean ,sample_sd):
 
-    var = 1/sample_var + 1/(tau**2) 
+    var = 1/(sample_sd**2) + 1/(tau**2) 
 
-    top = sample_mean/sample_var + mu/(tau**2)
+    top = sample_mean/(sample_sd**2) + mu/(tau**2)
 
     theta_hat = top/var
-
     return norm.rvs(loc = theta_hat, scale = np.sqrt(var)  )
 
 
 def mu_given_tau(tau):
 
     total_precision, mean = get_total_precision_and_precision_weighted_average(tau)
-    sd = np.sqrt(total_precision)
+    sd = np.sqrt(1/total_precision) #get sqrt of variance for rvs() function
 
     return norm.rvs( loc = mean, scale = sd )
 
-def simply_plot_the_chain(chain, with_burn_in = None, fmt_plt = "-"):
+def simply_plot_the_chain(chain, with_burn_in = None, title:str = None, fmt_plt = "-"):
     """plot the chain over time
     
     optionally view the chain after different burn in points,
     it would be preferably to pick an odd number of burn in points"""
+
     if not with_burn_in:
         fig, ax = plt.subplots()
         ax.plot(chain, fmt_plt)
         ax.set_xlabel("t")
         ax.set_ylabel("X")
+        if title:
+            plt.suptitle(title)
         plt.show()
         return
     
@@ -122,4 +122,7 @@ def simply_plot_the_chain(chain, with_burn_in = None, fmt_plt = "-"):
         subplot.set_xlabel("t")
         subplot.set_ylabel("X")
         subplot.set_title(f"burn in after {burn_in_point}")
+    
+    if title:
+        plt.suptitle(title)
     plt.show()
