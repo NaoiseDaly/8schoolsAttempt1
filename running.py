@@ -22,7 +22,7 @@ for tau in tau_chain1:
     mu = mu_given_tau(tau)
 
     theta = theta_given_hyperparams(mu, tau, DATA["yBar.j"], DATA["sigma.j"])
-    print(type(theta), theta)
+
     effect_in_A.append(theta[0]) # look we just know A will be the first
     max_effect.append(max(theta))
 
