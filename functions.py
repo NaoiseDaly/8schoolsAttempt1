@@ -25,11 +25,20 @@ def tau_MCMC(X0, max_t_iterations=10**3):
     #start timing here
     start_time = perf_counter()
 
-    def log_unnormalised_target_pdf(x):
+    def log_unnormalised_target_pdf(tau):
         """ log of tau's unnormalised pdf
          tau > 0 """
-        if x <= 0:
+        if tau <= 0:
             return -np.inf #log of zero
+        
+        total_prec, mu_hat = get_total_precision_and_precision_weighted_average(tau)
+
+        log_total_prec = np.log(total_prec)
+
+        big_sum = np.log(DATA["sigma.j"]+ tau**2) + (DATA["yBar.j"] - mu_hat)**2/(DATA["sigma.j"]+ tau**2)
+        big_sum = np.sum(big_sum)
+
+        return -( log_total_prec + big_sum )
         
         
     
