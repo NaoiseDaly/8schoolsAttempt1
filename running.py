@@ -4,12 +4,11 @@ import matplotlib.pyplot as plt
 logger = logging.getLogger(__name__)
 logging.basicConfig( level=logging.INFO)
 
-tau = 5
-print(tau)
-a, b = get_total_precision_and_precision_weighted_average(tau)
-print(a, "\n", b)
+np.random.seed(457)
 
-mus = [mu_given_tau(5) for _ in range(200)]
-print(np.mean(mus), np.var(mus))
-plt.hist(mus, bins =20)
-plt.show()
+tau_chain1 = tau_MCMC(5, 10 )
+
+simply_plot_the_chain(tau_chain1)
+
+# plt.hist(tau_chain1, bins = 20)
+# plt.show()

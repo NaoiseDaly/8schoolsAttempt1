@@ -35,7 +35,7 @@ def tau_MCMC(X0, max_t_iterations=10**3):
 
         log_total_prec = np.log(total_prec)
 
-        big_sum = np.log(DATA["sigma.j"]+ tau**2) + (DATA["yBar.j"] - mu_hat)**2/(DATA["sigma.j"]+ tau**2)
+        big_sum = np.log(DATA["sigma.j"]**2 + tau**2) + (DATA["yBar.j"] - mu_hat)**2/(DATA["sigma.j"]**2 + tau**2)
         big_sum = np.sum(big_sum)
 
         return -( log_total_prec + big_sum )
@@ -46,10 +46,15 @@ def tau_MCMC(X0, max_t_iterations=10**3):
         pass
     
     def proposal_sample(conditional):
-        pass
+        return uniform.rvs(loc = conditional, scale = 5)
     
     def log_alpha(current, new):
-       pass
+       
+       r = log_unnormalised_target_pdf(new)-log_unnormalised_target_pdf(current)
+       
+       logger.info(f"r = {log_unnormalised_target_pdf(new):.2f} - {log_unnormalised_target_pdf(current):.2f} = {min(0, r):.2f} ")
+
+       return min(0, r)
     
     chain = np.zeros(max_t_iterations)
     X_t = chain[0] = X0
@@ -62,7 +67,7 @@ def tau_MCMC(X0, max_t_iterations=10**3):
         log_u = log_unif_rvs[t]
         #get alpha on log scale
         log_alpha_prob = log_alpha(X_t, proposed_value)
-        
+        logger.info(F"proposed {proposed_value:.0f}, current {X_t:.0f} alpha {log_alpha_prob:.1f} u {log_u:.1f}")
         #decide if the chain accepts or rejects the move
         #this is setting X_t+1 but no point in creating another variable
         if log_u <= log_alpha_prob:
