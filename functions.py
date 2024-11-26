@@ -10,7 +10,7 @@ DATA = pd.read_csv("data.txt").rename(index = dict( (i, letter) for i, letter in
 
 def get_total_precision_and_precision_weighted_average(tau:float):
 
-    total_precision = np.sum( 1/(  tau**2 +DATA["sigma.j"]**2)  )
+    total_precision = np.sum( 1/(tau**2 +DATA["sigma.j"]**2)  )
 
     average = np.sum(DATA["yBar.j"]/(tau**2 +DATA["sigma.j"]**2 ) )
     precision_weighted_average = average/total_precision
@@ -78,11 +78,11 @@ def tau_MCMC(X0, max_t_iterations=10**3):
 
 def theta_given_hyperparams(mu, tau, sample_mean ,sample_sd):
 
-    var = 1/(sample_sd**2) + 1/(tau**2) 
+    var = 1/( 1/(sample_sd**2) + 1/(tau**2) )
 
     top = sample_mean/(sample_sd**2) + mu/(tau**2)
 
-    theta_hat = top/var
+    theta_hat = top*var
     return norm.rvs(loc = theta_hat, scale = np.sqrt(var)  )
 
 
